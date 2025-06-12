@@ -2,6 +2,7 @@ import React from 'react'
 import HeroSection from '../component/HeroSection'
 import TrustIndicators from '../component/TrustIndicators'
 import HotelSearchSection from '../component/HotelSearchSection'
+import PopularRooms from '../component/PopularRooms'
 
 const HomePage = () => {
   return (
@@ -9,6 +10,7 @@ const HomePage = () => {
       <HeroSection/>
       <HotelSearchSection/>
       <TrustIndicators/>
+      <PopularRooms/>
     </div>
   )
 }
