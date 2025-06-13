@@ -35,13 +35,13 @@ const Navbar = () => {
 
                 <div className='hidden md:flex space-x-4 pl-10'>
                     <Link to={'/register'} 
-                        className='text-white border-2 px-2 py-1 rounded bg-blue-500 border-blue-500 
+                        className='text-white border-2 px-3 py-1 rounded bg-blue-500 border-blue-500 
                         hover:bg-blue-600 transition-colors duration-200'
                     >
                         Kayıt
                     </Link>
                     <Link to={'/login'}  
-                        className='text-white border-2 px-2 py-1 rounded bg-blue-500 border-blue-500 
+                        className='text-white border-2 px-3 py-1 rounded bg-blue-500 border-blue-500 
                         hover:bg-blue-600 transition-colors duration-200'
                         >
                         Giriş
