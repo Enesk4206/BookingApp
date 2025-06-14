@@ -9,6 +9,11 @@ import AboutPage from './pages/AboutPage'
 import SupportPage from './pages/SupportPage'
 import Login from './pages/Authentication/Login'
 import Register from './pages/Authentication/Register'
+import AdminDashboard from './pages/Admin/AdminDashboard'
+import AdminCategory from './pages/Admin/AdminCategory'
+import AdminHotel from './pages/Admin/AdminHotel'
+import AdminRoom from './pages/Admin/AdminRoom'
+import AdminHotelCreate from './pages/Admin/AdminHotelCreate'
 
 const App = () => {
   return (
@@ -23,6 +28,13 @@ const App = () => {
             <Route path='/about' element={<AboutPage/>}/>
             <Route path='/login' element={<Login/>}/>
             <Route path='/register' element={<Register/>}/>
+            
+            <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
+            <Route path='/admin/hotel/list' element={<AdminHotel/>}/>
+            <Route path='/admin/hotel/create' element={<AdminHotelCreate/>}/>
+            <Route path='/admin/category' element={<AdminCategory/>}/>
+            <Route path='/admin/room' element={<AdminRoom/>}/>
+            
           </Routes>
       </main>
  

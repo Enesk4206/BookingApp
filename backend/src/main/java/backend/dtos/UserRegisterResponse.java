@@ -1,5 +1,6 @@
 package backend.dtos;
 
+import backend.models.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.Setter;
 public class UserRegisterResponse {
     private Long id;
     private String username;
-    private String password;
     private String email;
     private String token;
+    private Role role;
 }

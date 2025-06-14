@@ -31,7 +31,7 @@ public class CategoryService {
                 saved.getName()
             );
       } catch (RuntimeException e) {
-            throw new RuntimeException("Internal Server Error");
+            throw new RuntimeException("Internal Server Error"+e.getMessage(),e);
       }
     }
 
@@ -66,19 +66,19 @@ public class CategoryService {
             );
 
       } catch (RuntimeException e) {
-            throw new RuntimeException("Internal Server Error");
+            throw new RuntimeException("Internal Server Error"+ e.getMessage(),e);
       }
     }
 
     public void delete(Long id){
         try {
             Category existsCategory = categoryRepository.findById(id).orElseThrow(
-                () ->  new RuntimeException("Category wasn't found")
+            () ->  new RuntimeException("Category wasn't found")
             );
 
             categoryRepository.delete(existsCategory);
         }catch (RuntimeException e) {
-            throw new RuntimeException("Internal Server Error");
+            throw new RuntimeException("Internal Server Error"+ e.getMessage(), e);
       }
     }
 

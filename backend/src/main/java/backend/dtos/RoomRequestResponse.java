@@ -1,5 +1,7 @@
 package backend.dtos;
 
+import java.util.Set;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,10 +14,11 @@ import lombok.Setter;
 public class RoomRequestResponse {
 
     private Long id;
-    private String roomNumber;
-    private String adult;
-    private String kid;
-    private Long hotelId;
+    private int roomNumber;
+    private String type;
     private double price;
+    private boolean isAvailable;
     private double discount;
+    private Long hotelId;
+    private Set<Long> rezervationIds;
 }
