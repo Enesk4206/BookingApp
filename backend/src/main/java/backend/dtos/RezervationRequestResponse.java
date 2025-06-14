@@ -18,5 +18,5 @@ public class RezervationRequestResponse {
     private LocalDate endDate;
     private RezervationStatus status;
     private Long roomId;
-    private String customerId;
+    private Long customerId;
 }
