@@ -8,10 +8,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserLoginRequest {
+@AllArgsConstructor
+public class OwnerRegisterResponse {
+    private Long id;
     private String username;
-    private String password;
+    private String email;
     private Role role;
 }
