@@ -4,8 +4,10 @@ package backend.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,8 +35,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createOwner(request));
     }
     @PostMapping(value="/login")
-    public ResponseEntity<UserLoginResponse> createAPI(@RequestBody UserLoginRequest request){
+    public ResponseEntity<UserLoginResponse> loginAPI(@RequestBody UserLoginRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.login(request));
+    }
+    @GetMapping(value="/get-profile")
+    public ResponseEntity<UserLoginResponse> getProfileAPI(@RequestHeader("Authorization") String authHeader){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getProfile(authHeader));
     }
    
 }

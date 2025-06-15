@@ -23,36 +23,40 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     public UserRegisterResponse register(UserRegisterRequest request){
-        if(request.getRole() != Role.CUSTOMER){
+       try {
+            if(request.getRole() != Role.CUSTOMER){
             throw new RuntimeException("Only customer can register!");
         }
 
-        checkEmailAndUsernameUniqueness(request.getEmail(), request.getUsername());
+            checkEmailAndUsernameUniqueness(request.getEmail(), request.getUsername());
 
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
-        user.setRole(Role.CUSTOMER);
+            User user = new User();
+            user.setUsername(request.getUsername());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setEmail(request.getEmail());
+            user.setRole(Role.CUSTOMER);
 
-        User registered = userRepository.save(user);
+            User registered = userRepository.save(user);
 
-        UserDetails userDetails = org.springframework.security.core.userdetails.User
-            .withUsername(registered.getUsername())
-            .password(registered.getPassword())
-            .roles(registered.getRole().name())
-            .build();
+            UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .withUsername(registered.getUsername())
+                .password(registered.getPassword())
+                .roles(registered.getRole().name())
+                .build();
 
-        String token = jwtUtil.generateToken(userDetails);
-        return new UserRegisterResponse(
-            registered.getId(),
-            registered.getUsername(),
-            registered.getEmail(),
-            // jwtUtil.generateToken(registered),
-            token,
-            registered.getRole()
+            String token = jwtUtil.generateToken(userDetails);
+            return new UserRegisterResponse(
+                registered.getId(),
+                registered.getUsername(),
+                registered.getEmail(),
+                // jwtUtil.generateToken(registered),
+                token,
+                registered.getRole()
 
         );
+       } catch (RuntimeException e) {
+            throw new RuntimeException("Internal Server Error "+e.getMessage(),e);
+       }
     }
 
     public OwnerRegisterResponse createOwner(UserRegisterRequest request){
@@ -99,8 +103,30 @@ public class UserService {
             user.getId(),
             user.getUsername(),
             user.getEmail(),
+            user.getRole().name(),
             token
         );
+    }
+
+    public UserLoginResponse getProfile(String token){
+
+        if (token != null && token.startsWith("Bearer ")) {
+        token = token.substring(7).trim();
+        }
+
+
+        String username = jwtUtil.extractUsername(token);
+        User user = userRepository.findByUsername(username).orElseThrow(
+            ()->  new RuntimeException("User not found!")
+        );
+        return new UserLoginResponse(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getRole().name(),
+            token
+        );
+
     }
 
     private void checkEmailAndUsernameUniqueness(String email,String username){
