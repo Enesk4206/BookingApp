@@ -10,8 +10,10 @@ import backend.dtos.UserLoginRequest;
 import backend.dtos.UserLoginResponse;
 import backend.dtos.UserRegisterRequest;
 import backend.dtos.UserRegisterResponse;
+import backend.models.Hotel;
 import backend.models.Role;
 import backend.models.User;
+import backend.repositories.HotelRepository;
 import backend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final HotelRepository hotelRepository;
     private final JwtUtil jwtUtil;
 
     public UserRegisterResponse register(UserRegisterRequest request){
@@ -59,10 +62,14 @@ public class UserService {
        }
     }
 
-    public OwnerRegisterResponse createOwner(UserRegisterRequest request){
+    public OwnerRegisterResponse createOwner(OwnerRegisterResponse request){
         if(request.getRole() !=Role.OWNER){
             throw new RuntimeException("You can only create owner!");
         }
+
+        Hotel hotel = hotelRepository.findById(request.getHotelId()).orElseThrow(
+            () -> new RuntimeException("Hotel not found!")
+        );
 
         checkEmailAndUsernameUniqueness(request.getEmail(), request.getUsername());
 
@@ -72,12 +79,19 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setRole(Role.OWNER);
 
+
         User registered = userRepository.save(user);
+
+        hotel.setOwner(registered);
+        hotelRepository.save(hotel);
+
         return new OwnerRegisterResponse(
             registered.getId(),
             registered.getUsername(),
+            null,
             registered.getEmail(),
-            registered.getRole()
+            registered.getRole(),
+            hotel.getId()
 
         );
 

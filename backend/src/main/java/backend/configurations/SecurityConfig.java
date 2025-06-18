@@ -31,6 +31,7 @@ public class SecurityConfig {
         .csrf(csrf ->csrf.disable())
         .sessionManagement(sess ->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.POST, "/api/auth/create-owner").hasAnyRole("SUPERADMIN")
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/hotel/**").hasAnyRole("SUPERADMIN")
             .requestMatchers(HttpMethod.GET, "/api/hotel/**").hasAnyRole("SUPERADMIN")

@@ -14,6 +14,7 @@ import AdminCategory from './pages/Admin/AdminCategory'
 import AdminHotel from './pages/Admin/AdminHotel'
 import AdminRoom from './pages/Admin/AdminRoom'
 import AdminHotelCreate from './pages/Admin/AdminHotelCreate'
+import AdminAddOwner from './pages/Admin/AdminAddOwner'
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
             <Route path='/register' element={<Register/>}/>
             
             <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
+            <Route path='/admin/create-owner' element={<AdminAddOwner/>}/>
             <Route path='/admin/hotel/list' element={<AdminHotel/>}/>
             <Route path='/admin/hotel/create' element={<AdminHotelCreate/>}/>
             <Route path='/admin/category' element={<AdminCategory/>}/>

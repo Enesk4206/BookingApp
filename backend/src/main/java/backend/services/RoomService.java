@@ -17,7 +17,6 @@ import backend.repositories.HotelRepository;
 import backend.repositories.RoomRepository;
 import backend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-
 @Service
 @RequiredArgsConstructor
 public class RoomService {
@@ -26,23 +25,18 @@ public class RoomService {
     private final UserRepository userRepository;
 
     public RoomRequestResponse create(Long actingUserId, RoomRequestResponse request){
-      try {
-            //find Hotel
-            Hotel hotel = hotelRepository.findById(request.getHotelId()).orElseThrow(
-                () -> new RuntimeException("Hotel not found! with: "+request.getHotelId())
-            );
-            
-            //find User
-            User actingUser = userRepository.findById(actingUserId).orElseThrow(
-                () -> new RuntimeException("Hotel not found! with: "+actingUserId)
-            );
-            
-            //Authorization checkpoint
-            if(actingUser.getRole() == Role.OWNER){
-                if(!hotel.getOwner().getId().equals(actingUserId)){
-                    throw new RuntimeException("You can only create room to your own hotel!");
+        try {
+            Hotel hotel = hotelRepository.findById(request.getHotelId())
+                    .orElseThrow(() -> new RuntimeException("Hotel not found! with: "+request.getHotelId()));
+
+            User actingUser = userRepository.findById(actingUserId)
+                    .orElseThrow(() -> new RuntimeException("User not found! with: "+actingUserId));
+
+            if (actingUser.getRole() == Role.OWNER) {
+                if (!hotel.getOwner().getId().equals(actingUserId)) {
+                    throw new RuntimeException("You can only create rooms in your own hotel!");
                 }
-            }else if (actingUser.getRole() != Role.SUPERADMIN) {
+            } else if (actingUser.getRole() != Role.SUPERADMIN) {
                 throw new RuntimeException("You don't have permission to add rooms!");
             }
 
@@ -54,67 +48,39 @@ public class RoomService {
             room.setDiscount(request.getDiscount());
             room.setRezervations(new HashSet<>());
             room.setHotel(hotel);
-            
+
             Room created = roomRepository.save(room);
-            return new RoomRequestResponse(
-                created.getId(),
-                created.getRoomNumber(),
-                created.getType(),
-                created.getPrice(),
-                created.isAvailable(),
-                created.getDiscount(),
-                created.getHotel().getId(),
-                created.getRezervations().stream().map(Rezervation::getId).collect(Collectors.toSet())
-            );
-        
-      } catch (RuntimeException e) {
+
+            return convertToDto(created);
+        } catch (RuntimeException e) {
             throw new RuntimeException("Internal Server Error");
-      }
+        }
     }
 
     public List<RoomRequestResponse> listAll(){
         try {
-             List<Room> allRooms = roomRepository.findAll();
-
-            return allRooms.stream().map(
-                room -> new RoomRequestResponse(
-                    room.getId(),
-                    room.getRoomNumber(),
-                    room.getType(),
-                    room.getPrice(),
-                    room.isAvailable(),
-                    room.getDiscount(),
-                    room.getHotel().getId(),
-                    room.getRezervations().stream().map(Rezervation::getId).collect(Collectors.toSet())
-                    )
-            ).collect(Collectors.toList());
+            List<Room> allRooms = roomRepository.findAll();
+            return allRooms.stream().map(this::convertToDto).collect(Collectors.toList());
         } catch (RuntimeException e) {
             throw new RuntimeException("Internal Server Error");
-      }
-       
+        }
     }
 
     public RoomRequestResponse update(Long actingUserId, Long id, RoomRequestResponse request){
-      try {
-            //room
-            Room existsRoom = roomRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Room not found! with: "+id)
-            );
-            //user
-            User actingUser = userRepository.findById(actingUserId).orElseThrow(
-                () -> new RuntimeException("User not found! with: "+actingUserId)
-            );
+        try {
+            Room existsRoom = roomRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Room not found! with: " + id));
 
-            //Authentication checkpoint
-            if(actingUser.getRole() == Role.OWNER){
-                if(!existsRoom.getHotel().getOwner().getId().equals(actingUserId)){
-                    throw new RuntimeException("You can only create room to your own hotel!");
-                }else if(actingUser.getRole() !=Role.SUPERADMIN){
-                    throw new RuntimeException("You don't have permission to update rooms!");
+            User actingUser = userRepository.findById(actingUserId)
+                    .orElseThrow(() -> new RuntimeException("User not found! with: " + actingUserId));
 
+            if (actingUser.getRole() == Role.OWNER) {
+                if (!existsRoom.getHotel().getOwner().getId().equals(actingUserId)) {
+                    throw new RuntimeException("You can only update rooms in your own hotel!");
                 }
+            } else if (actingUser.getRole() != Role.SUPERADMIN) {
+                throw new RuntimeException("You don't have permission to update rooms!");
             }
-
 
             existsRoom.setRoomNumber(request.getRoomNumber());
             existsRoom.setType(request.getType());
@@ -122,45 +88,56 @@ public class RoomService {
             existsRoom.setAvailable(request.isAvailable());
             existsRoom.setDiscount(request.getDiscount());
             existsRoom.setRezervations(new HashSet<>());
-            
-            if(request.getHotelId() != null && existsRoom.getHotel().getId().equals(request.getHotelId())){
-                if(actingUser.getRole() != Role.SUPERADMIN){
-                    throw new RuntimeException("Only Superadmin can change the hotel of a room");
+
+            // Otel değişimi sadece SUPERADMIN'e açık
+            if (request.getHotelId() != null && !existsRoom.getHotel().getId().equals(request.getHotelId())) {
+                if (actingUser.getRole() != Role.SUPERADMIN) {
+                    throw new RuntimeException("Only SUPERADMIN can change the hotel of a room.");
                 }
+                Hotel newHotel = hotelRepository.findById(request.getHotelId())
+                        .orElseThrow(() -> new RuntimeException("Hotel not found with id: " + request.getHotelId()));
+                existsRoom.setHotel(newHotel);
             }
-            Hotel newHotel = hotelRepository.findById(request.getHotelId()).orElseThrow(
-                ()-> new RuntimeException("Hotel not found with id:"+request.getHotelId())
-            );
-            existsRoom.setHotel(newHotel);
 
             Room updated = roomRepository.save(existsRoom);
-            
-            return new RoomRequestResponse(
-                updated.getId(),
-                updated.getRoomNumber(),
-                updated.getType(),
-                updated.getPrice(),
-                updated.isAvailable(),
-                updated.getDiscount(),
-                updated.getHotel().getId(),
-                updated.getRezervations().stream().map(Rezervation::getId).collect(Collectors.toSet())
-            );
-            
-      } catch (RuntimeException e) {
+            return convertToDto(updated);
+        } catch (RuntimeException e) {
             throw new RuntimeException("Internal Server Error");
-      }
+        }
     }
 
-    public void delete(Long id){
+    public void delete(Long actingUserId, Long roomId) {
         try {
-            Room existsRoom = roomRepository.findById(id).orElseThrow(
-                () ->  new RuntimeException("Room wasn't found")
-            );
+            Room room = roomRepository.findById(roomId)
+                    .orElseThrow(() -> new RuntimeException("Room wasn't found"));
 
-            roomRepository.delete(existsRoom);
-        }catch (RuntimeException e) {
+            User actingUser = userRepository.findById(actingUserId)
+                    .orElseThrow(() -> new RuntimeException("User not found!"));
+
+            if (actingUser.getRole() == Role.OWNER) {
+                if (!room.getHotel().getOwner().getId().equals(actingUserId)) {
+                    throw new RuntimeException("You can only delete rooms in your own hotel!");
+                }
+            } else if (actingUser.getRole() != Role.SUPERADMIN) {
+                throw new RuntimeException("You don't have permission to delete this room!");
+            }
+
+            roomRepository.delete(room);
+        } catch (RuntimeException e) {
             throw new RuntimeException("Internal Server Error");
-      }
+        }
     }
 
+    private RoomRequestResponse convertToDto(Room room) {
+        return new RoomRequestResponse(
+                room.getId(),
+                room.getRoomNumber(),
+                room.getType(),
+                room.getPrice(),
+                room.isAvailable(),
+                room.getDiscount(),
+                room.getHotel().getId(),
+                room.getRezervations().stream().map(Rezervation::getId).collect(Collectors.toSet())
+        );
+    }
 }

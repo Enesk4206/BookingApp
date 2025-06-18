@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import backend.dtos.HotelRequestResponse;
 import backend.models.Category;
 import backend.models.Hotel;
-import backend.models.User;
 import backend.repositories.CategoryRepository;
 import backend.repositories.HotelRepository;
 import backend.repositories.RoomRepository;
@@ -28,9 +27,6 @@ public class HotelService {
             if(hotelRepository.existsByName(request.getName())){
                 throw new RuntimeException("Hotel name already exists!");
             }
-            User owner = userRepository.findById(request.getOwnerId()).orElseThrow(
-                ()-> new RuntimeException("Hotel owner not found!")
-            );
 
             Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(
                 () -> new RuntimeException("Category not found!")
@@ -40,7 +36,7 @@ public class HotelService {
             hotel.setName(request.getName());
             hotel.setDescription(request.getDescription());
             hotel.setImagePath(request.getImagePath());
-            hotel.setOwner(owner);
+            hotel.setOwner(null);
             hotel.setCategory(category);
 
             Hotel created = hotelRepository.save(hotel);
@@ -50,7 +46,7 @@ public class HotelService {
                 created.getName(),
                 created.getDescription(),
                 created.getImagePath(),
-                created.getOwner().getId(),
+                created.getOwner() != null ? created.getOwner().getId() : null,
                 created.getCategory().getId()
             );
 
@@ -69,7 +65,7 @@ public class HotelService {
                     hotel.getName(),
                     hotel.getDescription(),
                     hotel.getImagePath(),
-                    hotel.getOwner().getId(),
+                    hotel.getOwner() != null ? hotel.getOwner().getId() : null,
                     hotel.getCategory().getId()
                 )
             ).collect(Collectors.toList());

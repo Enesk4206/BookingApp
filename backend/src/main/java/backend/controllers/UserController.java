@@ -19,7 +19,7 @@ import backend.dtos.UserRegisterResponse;
 import backend.services.UserService;
 import lombok.RequiredArgsConstructor;
 
-@CrossOrigin(origins="http://localhost:8080")
+@CrossOrigin(origins="http://localhost:5173")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

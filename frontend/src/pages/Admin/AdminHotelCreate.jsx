@@ -6,7 +6,7 @@ import { getAllRooms } from "../../api/roomService";
 import { toast } from "react-hot-toast";
 
 const AdminHotelCreate = () => {
-  const [hotelName, setHotelName] = useState("");
+  const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [imagePath, setImagePath] = useState("");
   const [rate, setRate] = useState(0);
@@ -34,7 +34,7 @@ const AdminHotelCreate = () => {
     e.preventDefault();
     try {
       const hotelData = {
-        hotelName,
+        name,
         description,
         imagePath,
         rate,
@@ -44,7 +44,7 @@ const AdminHotelCreate = () => {
       await createHotel(hotelData);
       toast.success("Otel başarıyla eklendi!");
       // Temizle
-      setHotelName("");
+      setName("");
       setDescription("");
       setImagePath("");
       setRate(0);
@@ -71,9 +71,10 @@ const AdminHotelCreate = () => {
           <input
             type="text"
             placeholder="Otel Adı"
-            value={hotelName}
-            onChange={(e) => setHotelName(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="w-full border px-4 py-2 rounded"
+            required
           />
           <textarea
             placeholder="Açıklama"
